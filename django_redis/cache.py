@@ -1,6 +1,7 @@
 import functools
 import logging
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.core.cache.backends.base import BaseCache
 from django.utils.module_loading import import_string
@@ -61,6 +62,7 @@ class RedisCache(BaseCache):
             if self._log_ignored_exceptions
             else None
         )
+        self._dj_ver = DJANGO_VERSION[:3]
 
     @property
     def client(self):
@@ -95,7 +97,9 @@ class RedisCache(BaseCache):
 
     @omit_exception
     def delete(self, *args, **kwargs):
-        return self.client.delete(*args, **kwargs)
+        """returns a boolean instead of int since django version 3.1"""
+        result = self.client.delete(*args, **kwargs)
+        return bool(result) if self._dj_ver >= (3, 1, 0) else result
 
     @omit_exception
     def delete_pattern(self, *args, **kwargs):
