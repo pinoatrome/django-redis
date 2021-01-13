@@ -596,7 +596,7 @@ class DjangoRedisCacheTests(unittest.TestCase):
         if isinstance(cache.client, herd.HerdClient):
             self.assertAlmostEqual(ttl, 12)
         else:
-            self.assertAlmostEqual(ttl, 10)
+            self.assertAlmostEqual(ttl, 10, delta=.1)
 
         # Test ttl None
         cache.set("foo", "foo", timeout=None)
